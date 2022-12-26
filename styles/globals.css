@@ -252,7 +252,11 @@ span.text-red {
 }
 .footer-banner-container {
   padding: 100px 40px;
-  background-color: #f02d34;
+  background: radial-gradient(
+    circle at 4% 10%,
+    rgba(0, 255, 235, 1) 0%,
+    rgba(7, 58, 187, 1) 100%
+  );
   border-radius: 15px;
   position: relative;
   height: 400px;
