@@ -8,18 +8,22 @@ import {
   HeroBanner,
   Layout,
   Navbar,
+  Product,
 } from '../components/';
 
-const Home = () => {
+const Home = ({ products, bannerData }) => {
+  console.log(products);
   return (
     <>
-      <HeroBanner />
+      <HeroBanner heroBanner={bannerData.length && bannerData[0]} />
       <div className="products-heading ">
         <h2>Beset Selling Products</h2>
         <p>Speakers of many variations</p>
       </div>
       <div className="products-container">
-        {['Product 1', 'Product 2'].map((product) => product)}
+        {products?.map((product) => (
+          <Product product={product} />
+        ))}
       </div>
       <Footer />
     </>
@@ -32,6 +36,10 @@ export const getServerSideProps = async () => {
 
   const bannerQuery = '*[_type == "banner"]';
   const bannerData = await client.fetch(bannerQuery);
+
+  return {
+    props: { products, bannerData },
+  };
 };
 
 export default Home;
