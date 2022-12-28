@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { client, urlFor } from '../../lib/client';
 import {
   AiOutlineMinus,
   AiOutlinePlus,
@@ -7,13 +6,20 @@ import {
   AiOutlineStar,
 } from 'react-icons/ai';
 
+import { client, urlFor } from '../../lib/client';
 import { Product } from '../../components';
 import { useStateContext } from '../../context/StateContext';
 
 const ProductDetails = ({ product, products }) => {
   const { image, name, details, price } = product;
   const [index, setIndex] = useState(0);
-  const { decQty, incQty, qty, onAdd } = useStateContext();
+  const { decQty, incQty, qty, onAdd, setShowCart } = useStateContext();
+
+  const handleBuyNow = () => {
+    onAdd(product, qty);
+
+    setShowCart(true);
+  };
 
   return (
     <div>
@@ -25,13 +31,14 @@ const ProductDetails = ({ product, products }) => {
               className="product-detail-image bg-gradient_background"
             />
           </div>
-          <div className="small-images-container">
+          <div className="small-images-container bg">
             {image?.map((item, i) => (
               <img
+                key={i}
                 src={urlFor(item)}
                 className={
                   i === index
-                    ? 'small-image bg-gradient_background selected-image'
+                    ? 'small-image selected-image bg-gradient_background'
                     : 'small-image'
                 }
                 onMouseEnter={() => setIndex(i)}
@@ -39,6 +46,7 @@ const ProductDetails = ({ product, products }) => {
             ))}
           </div>
         </div>
+
         <div className="product-detail-desc">
           <h1>{name}</h1>
           <div className="reviews">
@@ -52,15 +60,15 @@ const ProductDetails = ({ product, products }) => {
             <p>(20)</p>
           </div>
           <h4>Details: </h4>
-          <p> {details} </p>
-          <p className="price"> ${price} </p>
+          <p>{details}</p>
+          <p className="price">${price}</p>
           <div className="quantity">
-            <h3>Quantity: </h3>
+            <h3>Quantity:</h3>
             <p className="quantity-desc">
               <span className="minus" onClick={decQty}>
                 <AiOutlineMinus />
               </span>
-              <span className="num"> {qty} </span>
+              <span className="num">{qty}</span>
               <span className="plus" onClick={incQty}>
                 <AiOutlinePlus />
               </span>
@@ -74,12 +82,13 @@ const ProductDetails = ({ product, products }) => {
             >
               Add to Cart
             </button>
-            <button type="button" className="buy-now">
+            <button type="button" className="buy-now" onClick={handleBuyNow}>
               Buy Now
             </button>
           </div>
         </div>
       </div>
+
       <div className="maylike-products-wrapper">
         <h2>You may also like</h2>
         <div className="marquee">
@@ -99,8 +108,11 @@ export const getStaticPaths = async () => {
     slug {
       current
     }
-  }`;
+  }
+  `;
+
   const products = await client.fetch(query);
+
   const paths = products.map((product) => ({
     params: {
       slug: product.slug.current,
@@ -119,6 +131,8 @@ export const getStaticProps = async ({ params: { slug } }) => {
 
   const product = await client.fetch(query);
   const products = await client.fetch(productsQuery);
+
+  console.log(product);
 
   return {
     props: { products, product },
